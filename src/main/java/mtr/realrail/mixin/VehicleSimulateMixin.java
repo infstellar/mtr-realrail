@@ -14,7 +14,6 @@ import org.mtr.core.data.TransportMode;
 import org.mtr.core.data.Vehicle;
 import org.mtr.core.tool.Utilities;
 import org.mtr.libraries.it.unimi.dsi.fastutil.ints.IntAVLTreeSet;
-import org.mtr.libraries.it.unimi.dsi.fastutil.longs.Long2LongAVLTreeMap;
 import org.mtr.libraries.it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import org.mtr.libraries.it.unimi.dsi.fastutil.objects.ObjectList;
 import org.spongepowered.asm.mixin.Final;
@@ -72,7 +71,7 @@ public abstract class VehicleSimulateMixin {
 	}
 
 	@Inject(method = "simulate", at = @At("HEAD"))
-	private void mtrrealrail$onSimulateHead(long millisElapsed, ObjectArrayList<?> vehiclePositions, Long2LongAVLTreeMap vehicleTimesAlongRoute, CallbackInfo callbackInfo) {
+	private void mtrrealrail$onSimulateHead(CallbackInfo callbackInfo) {
 		final Vehicle vehicle = (Vehicle) (Object) this;
 		if (vehicle.vehicleExtraData == null || vehicle.vehicleExtraData.immutablePath == null || vehicle.vehicleExtraData.immutablePath.isEmpty()) {
 			return;

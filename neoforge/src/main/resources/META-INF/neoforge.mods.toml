@@ -1,0 +1,33 @@
+modLoader = "javafml"
+loaderVersion = "[4,)"
+license = "MIT"
+
+[[mods]]
+modId = "mtrrealrail"
+version = "${modVersion}"
+displayName = "MTR RealRail"
+description = "更好的列车限速及信号判定"
+
+[[dependencies.mtrrealrail]]
+modId = "neoforge"
+type = "required"
+versionRange = "[21.1.265,21.2)"
+ordering = "NONE"
+side = "BOTH"
+
+[[dependencies.mtrrealrail]]
+modId = "minecraft"
+type = "required"
+versionRange = "[1.21.1]"
+ordering = "NONE"
+side = "BOTH"
+
+[[dependencies.mtrrealrail]]
+modId = "mtr"
+type = "required"
+versionRange = "[4.1.0-beta.2]"
+ordering = "AFTER"
+side = "BOTH"
+
+[[mixins]]
+config = "mtrrealrail.neoforge.mixins.json"

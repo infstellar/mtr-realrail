@@ -1,7 +1,6 @@
 # 更好的列车限速及信号判定 · MTR RealRail
 
-> Minecraft **1.20.1** + **Forge 47.x** + **MTR 4.0.5** 附属模组
-> 当前版本：**v1.5.0**（`mtrrealrail-1.5.0+1.20.1-forge.jar`）
+> MTR 附属模组 v1.5.0，支持 Minecraft **1.20.1** + **Forge 47.x** + **MTR 4.0.5**，以及 Minecraft **1.21.1** + **NeoForge 21.1.265** + **MTR 4.1.0-beta.2**。
 
 在 MTR 原版基础上补齐"限速判定 / 信号隔离 / 动态占用 / 路径与发车调度 / 站台智能调度"的一整套运行控制能力，
 并可与外置调度服务组成**规划 + 执行**的完整链路。
@@ -46,9 +45,9 @@
 
 ## 安装
 
-1. Minecraft 1.20.1 + Forge 47.4.x + **MTR 4.0.5**（Forge 版）。
-2. 把 `dist/mtrrealrail-1.5.0+1.20.1-forge.jar` 放进 `mods/`（**客户端 + 服务端都要放**）。
-3. 需要高级调度功能时，**同时**安装配套两件套（见上表），并先启动服务器、再启动 `mtr-tsc-dispatch-system`。
+1. 使用 Forge 1.20.1 时，安装 MTR 4.0.5 Forge 版和 `mtrrealrail-1.5.0+1.20.1.jar`。仓库的 `dist/` 也提供同版本的 Forge 发布包。
+2. 使用 NeoForge 1.21.1 时，安装 MTR 4.1.0-beta.2 NeoForge 版和 `mtrrealrail-1.5.0+1.21.1-neoforge.jar`。
+3. 客户端与服务端都需要安装对应版本。高级调度功能还需要 `mtr-tsc-dispatch-system` 和匹配当前 Minecraft、加载器及 MTR 版本的执行桥。
 
 ---
 
@@ -99,12 +98,21 @@ world/mtrrealrail/optimize.json    # 每个车厂的优化配置（含「车厂�
 
 ## 构建
 
-环境：**JDK 17**、**Gradle 8.1+**（自带 wrapper）、联网（首次会从 Modrinth 拉 MTR jar）。
+Forge 1.20.1 使用 **JDK 17**，在 `mtr-realrail/` 目录运行：
 
 ```bash
-./gradlew setupLibrary   # 从 MTR 4.0.5 发行 jar 提取 org.mtr.* 与重定位 fastutil 到 libs/mtr-compile.jar
-./gradlew build          # 产物 build/libs/mtrrealrail-1.5.0+1.20.1.jar
+bash ./gradlew build
 ```
+
+产物为 `build/libs/mtrrealrail-1.5.0+1.20.1.jar`。构建会从 Modrinth 下载 MTR 4.0.5 并提取编译依赖。
+
+NeoForge 1.21.1 使用 **JDK 21**，在 `mtr-realrail/` 目录运行：
+
+```bash
+./neoforge/gradlew -p neoforge build
+```
+
+产物为 `neoforge/build/libs/mtrrealrail-1.5.0+1.21.1-neoforge.jar`。两个构建共用限速、信号、调度算法及存档文件格式，各自适配加载器和 MTR 界面。
 
 > Windows 下若遇到 `Could not initialize native services`，把 `GRADLE_USER_HOME` 指到可写目录即可。
 > 自检：服务端加 `-Dmtrrealrail.verifyMixins=true`，启动时会强制加载全部 Mixin 目标类，注入失败直接报错。
@@ -113,9 +121,9 @@ world/mtrrealrail/optimize.json    # 每个车厂的优化配置（含「车厂�
 
 ## 兼容性
 
-- 目标：Minecraft 1.20.1 / Forge 47.4.23 / MTR 4.0.5（Forge）。
+- Forge 目标为 Minecraft 1.20.1 / Forge 47.4.23 / MTR 4.0.5。NeoForge 目标为 Minecraft 1.21.1 / NeoForge 21.1.265 / MTR 4.1.0-beta.2。
 - 只依赖 `org.mtr.core` 公开成员与少数 MTR 自有方法名（`init2`、`writePlatformCache` 等）；MTR 大版本改名时主 Mixin 配置会直接报错提示。
-- 客户端界面 Mixin 位于 `required=false` 配置：注入失败只记日志，不影响启动。
+- Forge 客户端界面 Mixin 的 `required` 为 `false`。NeoForge 在目标界面注入失败时会报告具体类和方法。
 - 与其它 MTR 附属共存良好；配合两件套时由它们负责规划与执行，本模组提供策略、界面与状态展示。
 
 ## 目录结构

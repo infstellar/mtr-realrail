@@ -30,7 +30,7 @@ import java.util.Set;
  * 站台按钮可<b>多选</b>（选中 = 允许停靠）；未选择任何站台表示"不限制"。
  * 顶部是线路级开关，底部是 应用 / 应用并刷新路线 / 返回(ESC)。</p>
  */
-public class RouteDispatchScreen extends Screen {
+public class RouteDispatchScreen extends RealRailScreen {
 
 	private static final int STATIONS_PER_PAGE = 3;
 	private static final int ROW_HEIGHT = 20;
@@ -160,7 +160,7 @@ public class RouteDispatchScreen extends Screen {
 
 	@Override
 	public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
-		renderBackground(guiGraphics);
+		renderFrame(guiGraphics, mouseX, mouseY, partialTick);
 		guiGraphics.drawCenteredString(font, title, width / 2, 8, 0xFFFFFF);
 		guiGraphics.drawCenteredString(font, Component.literal("线路: " + routeName + "（id " + routeId + "）"), width / 2, 19, 0xAAAAAA);
 
@@ -184,7 +184,6 @@ public class RouteDispatchScreen extends Screen {
 				6, height - 70, 0xFFFF80);
 		guiGraphics.drawString(font, Component.literal("状态: " + status + "　|　" + mtr.realrail.dispatch.TscDispatchBridge.chainStatusText()),
 				6, height - 58, 0x80FF80);
-		super.render(guiGraphics, mouseX, mouseY, partialTick);
 	}
 
 	@Override

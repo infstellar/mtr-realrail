@@ -1,0 +1,23 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "mtr.realrail.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "mixins": [
+    "NameColorDataBaseSchemaAccessor",
+    "RailSignalIsolationMixin",
+    "RoutePlatformDataMixin",
+    "VehicleSchemaAccessor",
+    "VehicleSimulateMixin"
+  ],
+  "client": [
+    "NameColorScreenAccessor",
+    "EditDepotScreenMixin",
+    "EditRouteScreenMixin",
+    "EditStationScreenMixin",
+    "RailModifierScreenMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

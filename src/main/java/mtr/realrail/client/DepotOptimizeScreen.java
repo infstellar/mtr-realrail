@@ -26,7 +26,7 @@ import net.minecraft.network.chat.Component;
  * <p>参数区起点由提示文字块高度决定，动作按钮行由屏高决定；当两者会重叠时自动压缩行距，
  * 因此窗口分辨率 / GUI 缩放变化时文字也不会压到按钮上。</p>
  */
-public class DepotOptimizeScreen extends Screen {
+public class DepotOptimizeScreen extends RealRailScreen {
 
 	private static final int ROW_HEIGHT = 20;
 	private static final int HINT_LINE_HEIGHT = 11;
@@ -163,7 +163,7 @@ public class DepotOptimizeScreen extends Screen {
 
 	@Override
 	public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
-		renderBackground(guiGraphics);
+		renderFrame(guiGraphics, mouseX, mouseY, partialTick);
 		guiGraphics.drawCenteredString(font, title, width / 2, 8, 0xFFFFFF);
 		guiGraphics.drawCenteredString(font,
 				Component.literal("车厂: " + (OptimizeScreenBridge.depotName().isEmpty() ? "-" : OptimizeScreenBridge.depotName())
@@ -186,7 +186,6 @@ public class DepotOptimizeScreen extends Screen {
 		guiGraphics.drawString(font, Component.literal("状态：" + (OptimizeScreenBridge.status().isEmpty() ? "读取中…" : OptimizeScreenBridge.status())),
 				COLUMN_A_X, hintY, 0x80FF80);
 
-		super.render(guiGraphics, mouseX, mouseY, partialTick);
 	}
 
 	@Override

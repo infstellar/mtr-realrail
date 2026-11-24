@@ -1,0 +1,67 @@
+plugins {
+    id 'java'
+    id 'net.neoforged.moddev' version '2.0.148'
+}
+
+def commonDir = layout.projectDirectory.dir('../src/main')
+def modProperties = new Properties()
+file('../gradle.properties').withInputStream { modProperties.load(it) }
+
+group = modProperties.mod_group_id
+version = "${modProperties.mod_version}+1.21.1"
+
+base {
+    archivesName = modProperties.mod_id
+}
+
+java.toolchain.languageVersion = JavaLanguageVersion.of(21)
+
+repositories {
+    maven {
+        url = 'https://api.modrinth.com/maven'
+        content { includeGroup 'maven.modrinth' }
+    }
+    mavenCentral()
+}
+
+neoForge {
+    version = '21.1.265'
+    runs {
+        client { client() }
+        server {
+            server()
+            programArgument '--nogui'
+            systemProperty 'mtrrealrail.verifyMixins', 'true'
+        }
+    }
+    mods {
+        mtrrealrail { sourceSet sourceSets.main }
+    }
+}
+
+dependencies {
+    implementation('maven.modrinth:XKPAmI6u:9SDO8rYc') { transitive = false }
+}
+
+tasks.named('compileJava', JavaCompile) {
+    source(fileTree(commonDir.dir('java')) {
+        // 同路径的 NeoForge 源文件覆盖 Forge 实现，其余源文件共用。
+        exclude { element -> !element.directory && file("src/main/java/${element.path}").isFile() }
+    })
+    options.encoding = 'UTF-8'
+    options.release = 21
+}
+
+tasks.named('processResources', ProcessResources) {
+    from(commonDir.dir('resources')) {
+        exclude 'META-INF/mods.toml', 'pack.mcmeta', 'mtrrealrail*.mixins.json'
+    }
+    filteringCharset = 'UTF-8'
+    inputs.property 'modVersion', modProperties.mod_version
+    filesMatching('META-INF/neoforge.mods.toml') { expand modVersion: modProperties.mod_version }
+}
+
+tasks.named('jar', Jar) {
+    archiveClassifier = 'neoforge'
+    from('../LICENSE')
+}

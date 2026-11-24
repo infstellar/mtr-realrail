@@ -3,7 +3,6 @@ package mtr.realrail.client;
 import mtr.realrail.NodeModeNetwork;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
-import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 
@@ -16,7 +15,7 @@ import net.minecraft.network.chat.Component;
  * <p>点击按钮切换该节点的判定方式：车头进入立即变更（原版）/ 车尾通过后变更（推荐），
  * 服务端切换后回发新状态刷新本界面；关闭时返回 MTR 原版轨道界面。</p>
  */
-public class NodeModeScreen extends Screen {
+public class NodeModeScreen extends RealRailScreen {
 
 	private final BlockPos pos;
 	private final boolean tailMode;
@@ -40,7 +39,7 @@ public class NodeModeScreen extends Screen {
 
 	@Override
 	public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
-		renderBackground(guiGraphics);
+		renderFrame(guiGraphics, mouseX, mouseY, partialTick);
 		guiGraphics.drawCenteredString(font, title, width / 2, height / 2 - 52, 0xFFFFFF);
 		guiGraphics.drawCenteredString(font,
 				Component.literal("节点位置: " + pos.getX() + ", " + pos.getY() + ", " + pos.getZ()),
@@ -48,7 +47,6 @@ public class NodeModeScreen extends Screen {
 		guiGraphics.drawCenteredString(font,
 				Component.literal("点击上方按钮切换判定方式（立即写入世界存档）"),
 				width / 2, height / 2 + 48, 0x808080);
-		super.render(guiGraphics, mouseX, mouseY, partialTick);
 	}
 
 	@Override
