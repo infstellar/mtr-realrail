@@ -15,18 +15,20 @@ import java.util.Properties;
  */
 public final class RealRailConfig {
 
+	private static final NodeMode DEFAULT_NODE_MODE = NodeMode.HEAD;
+
 	public static final RealRailConfig INSTANCE = new RealRailConfig();
 
 	/** 轨道节点限速变更的判定方式。 */
 	public enum NodeMode {
 		/** 车头进入新轨道段立即变更速度（MTR 原版行为）。 */
 		HEAD,
-		/** 车尾完全经过轨道连接器后才变更速度（本模组默认，需求一）。 */
+		/** 车尾完全经过轨道连接器后才变更速度。 */
 		TAIL
 	}
 
-	/** 未被刷子单独配置的节点所使用的默认判定方式（需求一：默认车尾判定）。 */
-	public NodeMode defaultNodeMode = NodeMode.TAIL;
+	/** 未被刷子单独配置的节点所使用的默认判定方式。 */
+	public NodeMode defaultNodeMode = DEFAULT_NODE_MODE;
 
 	/** 是否启用多信号系统隔离（需求二）。 */
 	public boolean signalIsolation = true;
@@ -107,9 +109,9 @@ public final class RealRailConfig {
 		}
 
 		try {
-			defaultNodeMode = NodeMode.valueOf(properties.getProperty(KEY_DEFAULT_NODE_MODE, "TAIL").trim().toUpperCase(Locale.ROOT));
+			defaultNodeMode = NodeMode.valueOf(properties.getProperty(KEY_DEFAULT_NODE_MODE, DEFAULT_NODE_MODE.name()).trim().toUpperCase(Locale.ROOT));
 		} catch (IllegalArgumentException ignored) {
-			defaultNodeMode = NodeMode.TAIL;
+			defaultNodeMode = DEFAULT_NODE_MODE;
 		}
 		signalIsolation = Boolean.parseBoolean(properties.getProperty(KEY_SIGNAL_ISOLATION, "true").trim());
 
@@ -166,8 +168,8 @@ public final class RealRailConfig {
 		try (final PrintWriter writer = new PrintWriter(Files.newBufferedWriter(file, StandardCharsets.UTF_8))) {
 			writer.println("# 更好的列车限速及信号判定（MTR RealRail）配置");
 			writer.println("#");
-			writer.println("# default_node_mode: TAIL = 车尾完全经过轨道连接器后才变更速度（默认，需求一）");
-			writer.println("#                    HEAD = 车头进入新轨道段立即变更速度（MTR 原版行为）");
+			writer.println("# default_node_mode: HEAD = 车头进入新轨道段立即变更速度（默认，MTR 原版行为）");
+			writer.println("#                    TAIL = 车尾完全经过轨道连接器后才变更速度");
 			writer.println("# 单个轨道节点可用刷子（mtr:brush）右击轨道节点方块：先打开 MTR 原版轨道界面，");
 			writer.println("# 点击其中的“节点限速判定”按钮即可单独覆盖此设置。");
 			writer.println(KEY_DEFAULT_NODE_MODE + "=" + defaultNodeMode.name());
