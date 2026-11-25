@@ -2,24 +2,14 @@
 
 > MTR 附属模组 v1.5.0，支持 Minecraft **1.20.1** + **Forge 47.x** + **MTR 4.0.5**，以及 Minecraft **1.21.1** + **NeoForge 21.1.265** + **MTR 4.1.0-beta.2**。
 
-在 MTR 原版基础上补齐"限速判定 / 信号隔离 / 动态占用 / 路径与发车调度 / 站台智能调度"的一整套运行控制能力，
-并可与外置调度服务组成**规划 + 执行**的完整链路。
+在 MTR 原版基础上补齐"限速判定 / 信号隔离 / 动态占用 / 路径与发车调度 / 站台智能调度"的一整套运行控制能力。
+NeoForge 1.21.1 版本把调度服务与执行桥一并包含在 RealRail JAR 内。
 
 ---
 
-## ⚠️ 可选配套模组（必须成对安装）
+## 调度组件
 
-本模组的"车站站台智能调度""车厂在线路中间""运行时改停站台"等高级功能依赖下面的**调度 + 执行**两件套，
-它们是一套体系里的**两个部分，必须同时安装**；缺任何一个都会退化为"无完整功能"（本模组其余功能不受影响）：
-
-| 仓库 | 作用 | 缺装后果 |
-|---|---|---|
-| [**mtr-tsc-dispatch-system**](https://github.com/R1145141919810/mtr-tsc-dispatch-system) | 外置调度与动态路径规划服务（规划端） | 站台智能调度进入"等待 tsc-dispatch"待机，不会自行派车/改停 |
-| [**mtr-control-execute-brige**](https://github.com/R1145141919810/mtr-control-execute-brige) | 游戏内控制执行桥（执行端，默认 `127.0.0.1:8889`） | 站台智能调度进入"等待执行链"待机；"车厂在线路中间"不会派车/回场 |
-
-> **务必两个一起装**：单独装规划端只能"看"，单独装执行端没有人下指令。
-> 两者都就绪后，本模组会自动把执行桥地址/令牌推送给规划服务（`POST /v1/config`），
-> 线路调度界面底部会显示 `执行链：tsc-dispatch 已连接 / 执行桥 mtbridge 已连接`。
+NeoForge 1.21.1 的 `mtrrealrail-1.5.0+1.21.1-neoforge.jar` 已包含调度与执行代码，客户端和服务端只需安装 RealRail 与匹配版本的 MTR。首次启动会生成 `config/tsc-dispatch.yml`；当前存档的调度状态保存在 `world/mtrrealrail/dispatch/`。Forge 1.20.1 版本仍按原有方式使用外部调度服务和执行桥。
 
 ---
 
@@ -47,7 +37,7 @@
 
 1. 使用 Forge 1.20.1 时，安装 MTR 4.0.5 Forge 版和 `mtrrealrail-1.5.0+1.20.1.jar`。仓库的 `dist/` 也提供同版本的 Forge 发布包。
 2. 使用 NeoForge 1.21.1 时，安装 MTR 4.1.0-beta.2 NeoForge 版和 `mtrrealrail-1.5.0+1.21.1-neoforge.jar`。
-3. 客户端与服务端都需要安装对应版本。高级调度功能还需要 `mtr-tsc-dispatch-system` 和匹配当前 Minecraft、加载器及 MTR 版本的执行桥。
+3. 客户端与服务端都需要安装对应版本。NeoForge 1.21.1 不需要另外安装调度服务或执行桥。
 
 ---
 
@@ -70,21 +60,13 @@ optimize_dwell_threshold_seconds=10
 optimize_conflict_window_seconds=5
 optimize_max_hold_seconds=15
 
-# 调度链（规划端 tsc-dispatch + 执行桥）
+# 调度功能开关
 tsc_dispatch_enabled=true
-tsc_dispatch_url=http://127.0.0.1:8787
-tsc_dispatch_poll_seconds=2
-tsc_dispatch_required=true        # true = 选台决策只认调度服务
-tsc_dispatch_dimension=0
-tsc_dispatch_timeout_ms=1200
-tsc_dispatch_export_path=../tsc-dispatch/config/dispatch.generated.yml
-
-bridge_url=http://127.0.0.1:8889  # 执行桥地址
-bridge_token=                     # 留空 = 自动读取 config/mtbridge.json 的 token
-bridge_push_enabled=true          # 自动把桥地址/令牌推给调度服务
-bridge_probe_seconds=5
-execution_chain_required=true     # 链不完整时高级调度待机（不本地乱派）
+tsc_dispatch_required=true        # true = 执行链不可用时等待，不启用本地选台
+execution_chain_required=true     # 要求调度服务与执行桥都已就绪
 ```
+
+NeoForge 调度参数、执行桥端口和管理页端口由 `config/tsc-dispatch.yml` 管理；该文件首次启动时自动生成。执行桥默认只绑定 `127.0.0.1`，非本机访问时必须配置令牌。
 
 存档级配置（随世界保存）：
 
@@ -112,7 +94,7 @@ NeoForge 1.21.1 使用 **JDK 21**，在 `mtr-realrail/` 目录运行：
 ./neoforge/gradlew -p neoforge build
 ```
 
-产物为 `neoforge/build/libs/mtrrealrail-1.5.0+1.21.1-neoforge.jar`。两个构建共用限速、信号、调度算法及存档文件格式，各自适配加载器和 MTR 界面。
+产物为 `neoforge/build/libs/mtrrealrail-1.5.0+1.21.1-neoforge.jar`。NeoForge JAR 内含调度服务与执行桥；Forge 构建继续保留旧版外部调度连接方式。
 
 > Windows 下若遇到 `Could not initialize native services`，把 `GRADLE_USER_HOME` 指到可写目录即可。
 > 自检：服务端加 `-Dmtrrealrail.verifyMixins=true`，启动时会强制加载全部 Mixin 目标类，注入失败直接报错。
